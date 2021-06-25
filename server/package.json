@@ -1,0 +1,19 @@
+{
+  "name": "browserjs",
+  "version": "1.0.0",
+  "description": "Browser.JS Streaming Server",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/td512/browser.git"
+  },
+  "author": "Theo M <theo@theom.nz>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/td512/browser/issues"
+  },
+  "homepage": "https://github.com/td512/browser#readme"
+}
