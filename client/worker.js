@@ -31,6 +31,9 @@ function doAsyncPromise(url) {
 var base = "http://localhost:8001"
 
 self.addEventListener('fetch', async function(event) {
+    if (event.isReload) {
+        base = "http://localhost:8001"
+    }
     var url = event.request.url.replace('http://localhost:8001', '')[0] === '/' ? checkScheme(base+event.request.url.replace('http://localhost:8001', '')) : event.request.url
 
     if (url.includes('localhost') || url.includes('s3.theom.nz') || url.includes('code.jquery.com')) {
