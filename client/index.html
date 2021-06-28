@@ -16,20 +16,40 @@
     .ng-anchor {
         position: absolute;
     }
-    browser-container { position: relative; }
-    .content-container { background: #1E1E1E; color: #858585; overflow: hidden; text-align: center; }
-    .content-container > h1 { font-family: 'San Francisco Display'; font-weight: 700; font-style: normal; }
-    .content-container > p { font-family: 'San Francisco Display'; font-weight: 200; font-style: normal; }
-</style>
+
+    browser-container {
+        position: relative;
+    }
+
+    .content-container {
+        background: #1E1E1E;
+        color: #858585;
+        overflow: hidden;
+        text-align: center;
+    }
+
+    .content-container > h1 {
+        font-family: 'San Francisco Display';
+        font-weight: 700;
+        font-style: normal;
+    }
+
+    .content-container > p {
+        font-family: 'San Francisco Display';
+        font-weight: 200;
+        font-style: normal;
+    }
+    </style>
     <meta content="text/html;charset=UTF-8" http-equiv="content-type">
-    <meta content="A browser in your browser" name="description" />
-    <meta content="browser, js, browser.js, browserjs" name="keywords" />
+    <meta content="A browser in your browser" name="description"/>
+    <meta content="browser, js, browser.js, browserjs" name="keywords"/>
     <meta content="mailto:http:sha1:e82c7705fe2e57837193994642bc9f071bb8611c" name="microid">
     <meta content="user-scalable=0, initial-scale=1.0" name="viewport">
     <title>Browser.JS - Browsers in Browsers!</title>
     <link rel="stylesheet" media="all"
           href="application.css">
-    <link href="https://fonts.s3.theom.nz/SanFrancisco.css" rel="stylesheet" />
+    <link href="https://fonts.s3.theom.nz/SanFrancisco.css" rel="stylesheet"/>
+    <script src="service.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="ng-scope">
@@ -48,19 +68,20 @@
                                         <div class="browser-frame-top-left"></div>
                                         <div class="browser-frame-top-input">
                                             <div class="browser-frame-top-input-left"></div>
-                                            <span class="browser-frame-top-input-url ng-binding" id="urlInput" ng-bind="url">Not Connected</span>
+                                            <span class="browser-frame-top-input-url ng-binding" id="urlInput"
+                                                  ng-bind="url">Not Connected</span>
                                             <div class="browser-frame-top-input-right"></div>
                                         </div>
                                         <div class="browser-frame-top-right"></div>
                                     </div>
                                 </div>
                                 <div class="browser-frame-content">
-                                    <browser-container>
-                                      <div class="content-container">
-                                        <h1>Connecting...</h1><br>
-                                        <p>Hold on, we're connecting you to the interwebz, this won't take long</p>
-                                      </div>
-                                    </browser-container>
+                                    <object id="objContainer">
+                                        <div class="content-container">
+                                            <h1>Connecting...</h1><br>
+                                            <p>Hold on, we're connecting you to the interwebz, this won't take long</p>
+                                        </div>
+                                    </object>
                                 </div>
                             </div>
                         </browser-frame>
@@ -75,33 +96,37 @@
 </div>
 <script>
     function addhttp(url) {
-    if (!/^(?:f|ht)tps?\:\/\//.test(url)) {
-        url = "http://" + url;
-    }
-    return url;
+        if (!/^(?:f|ht)tps?\:\/\//.test(url)) {
+            url = "http://" + url;
+        }
+        return url;
     }
 
     current_base = ""
-    $(function(){
-    window.WebSocket = window.WebSocket || window.MozWebSocket;
-    var socket = new WebSocket('ws://127.0.0.1:8000');
-    socket.onopen = function () {
-        socket.send(JSON.stringify({'type':'init'}));
-    };
+    $(function () {
+        window.WebSocket = window.WebSocket || window.MozWebSocket;
+        var socket = new WebSocket('ws://127.0.0.1:8000');
+        socket.onopen = function () {
+            socket.send(JSON.stringify({'type': 'init'}));
+        };
 
-    socket.onmessage = function (message) {
-      context = JSON.parse(message.data)
-      if (context.type === "displayContent") {
-         $('.content-container').html(context.html)
-         $('.browser-frame-top-input-url').html(context.url)
-      }
+        socket.onmessage = function (message) {
+            context = JSON.parse(message.data)
+            if (context.type === "displayContent") {
+                $('.content-container').html(context.html)
+                $('.browser-frame-top-input-url').html(context.url)
+            }
 
-    };
+        };
 
-    socket.onerror = function (error) {
-        console.log('WebSocket error: ' + error);
-    };
-        $('.browser-frame-top-input-url').bind('click', function() {
+        socket.onerror = function (error) {
+            console.log('WebSocket error: ' + error);
+        };
+        $(document).on('click', 'a', function (e) {
+            e.preventDefault()
+            socket.send(JSON.stringify({'type': 'loadUri', 'uri': addhttp(current_base + $(this).attr('href'))}))
+        })
+        $('.browser-frame-top-input-url').bind('click', function () {
             $(this).attr('contentEditable', true);
         }).keypress(function (e) {
             var key = e.which;
@@ -109,7 +134,8 @@
             {
                 $(this).attr('contentEditable', false)
                 uri = $('#urlInput').text().trim()
-                socket.send(JSON.stringify({'type':'loadUri','uri':addhttp(uri)}))
+                current_base = uri
+                socket.send(JSON.stringify({'type': 'loadUri', 'uri': addhttp(uri)}))
             }
         })
     })
