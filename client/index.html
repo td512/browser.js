@@ -87,6 +87,21 @@
                 $(this).attr('contentEditable', false)
             }
         })
+        window.WebSocket = window.WebSocket || window.MozWebSocket;
+
+    var socket = new WebSocket('ws://127.0.0.1:8000');
+    socket.onopen = function () {
+        socket.send('hello from the client');
+    };
+
+    socket.onmessage = function (message) {
+        console.log(message.data);
+    };
+
+    socket.onerror = function (error) {
+        console.log('WebSocket error: ' + error);
+    };
+
     })
 </script>
 </body>
