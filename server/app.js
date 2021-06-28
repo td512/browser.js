@@ -1,7 +1,9 @@
 var server = require('websocket').server, http = require('http'), https = require('https'), req = require('request');
 
+const PORT = process.env.PORT || 8000;
+
 var socket = new server({  
-    httpServer: http.createServer().listen(8000)
+    httpServer: http.createServer().listen(PORT)
 });
 
 socket.on('request', function(request) {  
