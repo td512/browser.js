@@ -21,7 +21,8 @@ function doAsyncPromise(url) {
             console.log('recv')
             context = JSON.parse(message.data)
             if (context.type === "rawContent") {
-                fulfill(context.content)
+                console.log(context.content)
+                fulfill(new Response(atob(context.content), { headers: { 'Content-Type': context.contentType }}))
             }
         }
     });
@@ -37,9 +38,10 @@ self.addEventListener('fetch', async function(event) {
         event.respondWith(fetch(url))
     } else {
         console.log("Serving request:", event.request.url.replace('http://localhost:8001', ''));
+
         event.respondWith(
             doAsyncPromise(url).then((res) => {
-                return new Response(res)
+                return res
             })
         )
     }
