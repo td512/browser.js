@@ -15,7 +15,12 @@
 
     .ng-anchor {
         position: absolute;
-    }</style>
+    }
+    browser-container { position: relative; }
+    .content-container { background: #1E1E1E; color: #858585; overflow: hidden; text-align: center; }
+    .content-container > h1 { font-family: 'San Francisco Display'; font-weight: 700; font-style: normal; }
+    .content-container > p { font-family: 'San Francisco Display'; font-weight: 200; font-style: normal; }
+</style>
     <meta content="text/html;charset=UTF-8" http-equiv="content-type">
     <meta content="A browser in your browser" name="description" />
     <meta content="browser, js, browser.js, browserjs" name="keywords" />
@@ -24,6 +29,7 @@
     <title>Browser.JS - Browsers in Browsers!</title>
     <link rel="stylesheet" media="all"
           href="application.css">
+    <link href="https://fonts.s3.theom.nz/SanFrancisco.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="ng-scope">
@@ -42,7 +48,7 @@
                                         <div class="browser-frame-top-left"></div>
                                         <div class="browser-frame-top-input">
                                             <div class="browser-frame-top-input-left"></div>
-                                            <span class="browser-frame-top-input-url ng-binding" ng-bind="url">${BROWSER_URL}</span>
+                                            <span class="browser-frame-top-input-url ng-binding" ng-bind="url">Not Connected</span>
                                             <div class="browser-frame-top-input-right"></div>
                                         </div>
                                         <div class="browser-frame-top-right"></div>
@@ -50,7 +56,10 @@
                                 </div>
                                 <div class="browser-frame-content">
                                     <browser-container>
-
+                                      <div class="content-container">
+                                        <h1>Connecting...</h1><br>
+                                        <p>Hold on, we're connecting you to the interwebz, this won't take long</p>
+                                      </div>
                                     </browser-container>
                                 </div>
                             </div>
