@@ -1,5 +1,4 @@
-var server = require('websocket').server, http = require('http'), https = require('https'), req = require('request').defaults({ encoding: null }),
-    contentTypeParser = require("content-type-parser"), request = require('request');
+var server = require('websocket').server, http = require('http'), https = require('https'), req = require('request').defaults({ encoding: null }), contentTypeParser = require("content-type-parser");
 
 const PORT = process.env.PORT || 8000;
 
@@ -19,14 +18,19 @@ socket.on('request', function(request) {
           uri = 'Start here'
           connection.send(JSON.stringify({'type':'displayContent','url':uri,'html':content}));
         } else if (command.type === 'loadUri') {
-          request(command.uri, function (err, res, body) {
+          req(command.uri, function (err, res, body) {
           uri = command.uri
-          connection.send(JSON.stringify({'type':'displayContent','url':uri,'html':res.body}));
+          connection.send(JSON.stringify({'type':'displayContent','url':uri,'html':Buffer.from(body).toString()}));
          })
          } else if (command.type === 'loadLibraryAsRaw') {
             req(command.uri, function (err, res, body) {
                 let contentType = contentTypeParser(res.headers['content-type'])
-                connection.send(JSON.stringify({'type': 'rawContent', 'content': Buffer.from(body).toString('base64'), 'contentType': contentType.type+'/'+contentType.subtype}));
+                if (contentType.subtype === 'css' || contentType.subtype === 'javascript' || contentType.subtype === 'svg+xml') {
+                    data = Buffer.from(body).toString()
+                } else {
+                    let data = "data:" + contentType.type+'/'+contentType.subtype + ";base64," + Buffer.from(body).toString('base64')
+                }
+                connection.send(JSON.stringify({'type': 'rawContent', 'content': data, 'contentType': contentType.type+'/'+contentType.subtype}));
             })
         }
     });

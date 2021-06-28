@@ -21,8 +21,7 @@ function doAsyncPromise(url) {
             console.log('recv')
             context = JSON.parse(message.data)
             if (context.type === "rawContent") {
-                console.log(context.content)
-                fulfill(new Response(atob(context.content), { headers: { 'Content-Type': context.contentType }}))
+                fulfill(new Response(context.content, { headers: { 'Content-Type': context.contentType }}))
             }
         }
     });
@@ -41,7 +40,6 @@ self.addEventListener('fetch', async function(event) {
         event.respondWith(fetch(url))
     } else {
         console.log("Serving request:", event.request.url.replace('http://browserjs.s3.theom.nz', ''));
-
         event.respondWith(
             doAsyncPromise(url).then((res) => {
                 return res
