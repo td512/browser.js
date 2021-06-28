@@ -1,4 +1,4 @@
-var server = require('websocket').server, http = require('http');
+var server = require('websocket').server, http = require('http'), https = require('https'), req = require('request');
 
 var socket = new server({  
     httpServer: http.createServer().listen(8000)
@@ -8,11 +8,19 @@ socket.on('request', function(request) {
     var connection = request.accept(null, request.origin);
 
     connection.on('message', function(message) {
-        console.log(message.utf8Data);
-        connection.sendUTF('hello');
-        setTimeout(function() {
-            connection.sendUTF('this is a websocket example');
-        }, 1000);
+        let command = JSON.parse(message.utf8Data)
+        let content = ""
+        console.log(command)
+        if (command.type === 'init') {
+          content = `<div class="content-container"><h1>Start by entering a URL in the box above</h1><br><p>No URL has currently been loaded into this browser</p></div>`
+          uri = 'Start here'
+          connection.send(JSON.stringify({'type':'displayContent','url':uri,'html':content}));
+        } else if (command.type === 'loadUri') {
+          req(command.uri, function (err, res, body) {
+          uri = command.uri
+          connection.send(JSON.stringify({'type':'displayContent','url':uri,'html':res.body}));
+         })
+         }
     });
 
     connection.on('close', function(connection) {

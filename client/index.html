@@ -48,7 +48,7 @@
                                         <div class="browser-frame-top-left"></div>
                                         <div class="browser-frame-top-input">
                                             <div class="browser-frame-top-input-left"></div>
-                                            <span class="browser-frame-top-input-url ng-binding" ng-bind="url">Not Connected</span>
+                                            <span class="browser-frame-top-input-url ng-binding" id="urlInput" ng-bind="url">Not Connected</span>
                                             <div class="browser-frame-top-input-right"></div>
                                         </div>
                                         <div class="browser-frame-top-right"></div>
@@ -74,34 +74,44 @@
     </div>
 </div>
 <script>
-    $(function(){
-        $('.browser-frame-top-input-url').bind('click', function() {
-            $(this).attr('contentEditable', true);
-        }).blur(
-            function() {
-                $(this).attr('contentEditable', false);
-            }).keypress(function (e) {
-            var key = e.which;
-            if (key == 13)  // the enter key code
-            {
-                $(this).attr('contentEditable', false)
-            }
-        })
-        window.WebSocket = window.WebSocket || window.MozWebSocket;
+    function addhttp(url) {
+    if (!/^(?:f|ht)tps?\:\/\//.test(url)) {
+        url = "http://" + url;
+    }
+    return url;
+    }
 
+    current_base = ""
+    $(function(){
+    window.WebSocket = window.WebSocket || window.MozWebSocket;
     var socket = new WebSocket('ws://127.0.0.1:8000');
     socket.onopen = function () {
-        socket.send('hello from the client');
+        socket.send(JSON.stringify({'type':'init'}));
     };
 
     socket.onmessage = function (message) {
-        console.log(message.data);
+      context = JSON.parse(message.data)
+      if (context.type === "displayContent") {
+         $('.content-container').html(context.html)
+         $('.browser-frame-top-input-url').html(context.url)
+      }
+
     };
 
     socket.onerror = function (error) {
         console.log('WebSocket error: ' + error);
     };
-
+        $('.browser-frame-top-input-url').bind('click', function() {
+            $(this).attr('contentEditable', true);
+        }).keypress(function (e) {
+            var key = e.which;
+            if (key == 13)  // the enter key code
+            {
+                $(this).attr('contentEditable', false)
+                uri = $('#urlInput').text().trim()
+                socket.send(JSON.stringify({'type':'loadUri','uri':addhttp(uri)}))
+            }
+        })
     })
 </script>
 </body>
