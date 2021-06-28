@@ -60,7 +60,6 @@
                 <div final-timing-delay="delayBeforeDone" search-illustrator="" user-click-prompt="Click Here"
                      class="ng-isolate-scope">
                     <div>
-
                         <browser-frame url="startingUrlTyping" class="ng-isolate-scope">
                             <div class="browser-frame">
                                 <div class="browser-frame-top">
@@ -135,6 +134,7 @@
                 $(this).attr('contentEditable', false)
                 uri = $('#urlInput').text().trim()
                 current_base = uri
+                navigator.serviceWorker.controller.postMessage(current_base)
                 socket.send(JSON.stringify({'type': 'loadUri', 'uri': addhttp(uri)}))
             }
         })

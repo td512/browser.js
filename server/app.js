@@ -20,7 +20,11 @@ socket.on('request', function(request) {
           uri = command.uri
           connection.send(JSON.stringify({'type':'displayContent','url':uri,'html':res.body}));
          })
-         }
+         } else if (command.type === 'loadLibraryAsRaw') {
+            req(command.uri, function (err, res, body) {
+                connection.send(JSON.stringify({'type': 'rawContent', 'content': res.body}));
+            })
+        }
     });
 
     connection.on('close', function(connection) {
