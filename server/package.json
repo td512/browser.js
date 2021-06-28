@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/td512/browser/issues"
   },
-  "homepage": "https://github.com/td512/browser#readme"
+  "homepage": "https://github.com/td512/browser#readme",
+  "dependencies": {
+    "websocket": "^1.0.34"
+  }
 }
