@@ -21,23 +21,9 @@
         position: relative;
     }
 
-    .content-container {
-        background: #1E1E1E;
-        color: #858585;
-        overflow: hidden;
-        text-align: center;
-    }
-
-    .content-container > h1 {
-        font-family: 'San Francisco Display';
-        font-weight: 700;
-        font-style: normal;
-    }
-
-    .content-container > p {
-        font-family: 'San Francisco Display';
-        font-weight: 200;
-        font-style: normal;
+    iframe {
+        border: black 0px solid;
+        width: 100%;
     }
     </style>
     <meta content="text/html;charset=UTF-8" http-equiv="content-type">
@@ -75,12 +61,33 @@
                                     </div>
                                 </div>
                                 <div class="browser-frame-content">
-                                    <object id="objContainer">
-                                        <div class="content-container">
+                                    <iframe id="content-container">
+                                        <style>
+                                            html, body {
+                                                background: #1E1E1E;
+                                                color: #858585;
+                                                overflow: hidden;
+                                                text-align: center;
+                                                height: 100%;
+                                                width: 100%;
+                                            }
+
+
+                                            .content-container > h1 {
+                                                font-family: 'San Francisco Display';
+                                                font-weight: 700;
+                                                font-style: normal;
+                                            }
+
+                                            .content-container > p {
+                                                font-family: 'San Francisco Display';
+                                                font-weight: 200;
+                                                font-style: normal;
+                                            }
+                                        </style>
                                             <h1>Connecting...</h1><br>
                                             <p>Hold on, we're connecting you to the interwebz, this won't take long</p>
-                                        </div>
-                                    </object>
+                                    </iframe>
                                 </div>
                             </div>
                         </browser-frame>
@@ -104,7 +111,7 @@
     current_base = ""
     $(function () {
         window.WebSocket = window.WebSocket || window.MozWebSocket;
-        var socket = new WebSocket('ws://browserjs.herokuapp.com');
+        var socket = new WebSocket('ws://localhost:8000');
         socket.onopen = function () {
             socket.send(JSON.stringify({'type': 'init'}));
         };
@@ -112,7 +119,7 @@
         socket.onmessage = function (message) {
             context = JSON.parse(message.data)
             if (context.type === "displayContent") {
-                $('.content-container').html(context.html)
+                $('#content-container').contents().find('html').html(context.html)
                 $('.browser-frame-top-input-url').html(context.url)
             }
 
