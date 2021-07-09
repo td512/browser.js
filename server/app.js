@@ -24,13 +24,18 @@ socket.on('request', function(request) {
          })
          } else if (command.type === 'loadLibraryAsRaw') {
             req(command.uri, function (err, res, body) {
-                let contentType = contentTypeParser(res.headers['content-type'])
-                if (contentType.subtype === 'css' || contentType.subtype === 'javascript' || contentType.subtype === 'svg+xml') {
-                    data = Buffer.from(body).toString()
-                } else {
-                    let data = "data:" + contentType.type+'/'+contentType.subtype + ";base64," + Buffer.from(body).toString('base64')
-                }
-                connection.send(JSON.stringify({'type': 'rawContent', 'content': data, 'contentType': contentType.type+'/'+contentType.subtype}));
+				try {
+					let contentType = contentTypeParser(res.headers['content-type'])
+					if (contentType.subtype === 'css' || contentType.subtype === 'javascript' || contentType.subtype === 'svg+xml') {
+						data = Buffer.from(body).toString()
+					} else {
+						let data = "data:" + contentType.type+'/'+contentType.subtype + ";base64," + Buffer.from(body).toString('base64')
+					}
+					connection.send(JSON.stringify({'type': 'rawContent', 'content': data, 'contentType': contentType.type+'/'+contentType.subtype}));
+				}  catch (err) {
+					connection.send(JSON.stringify({'type': 'rawContent', 'content': err , 'contentType': contentType.type+'/'+contentType.subtype}));
+				}
+                
             })
         }
     });
