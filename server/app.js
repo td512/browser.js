@@ -23,17 +23,25 @@ socket.on('request', function(request) {
           connection.send(JSON.stringify({'type':'displayContent','url':uri,'html':Buffer.from(body).toString()}));
          })
          } else if (command.type === 'loadLibraryAsRaw') {
-            req(command.uri, function (err, res, body) {
+			options = {
+				url: command.uri,
+				headers: {
+					'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0'
+				}
+			}
+            req(options, function (err, res, body) {
+				let data = true
 				try {
 					let contentType = contentTypeParser(res.headers['content-type'])
 					if (contentType.subtype === 'css' || contentType.subtype === 'javascript' || contentType.subtype === 'svg+xml') {
 						data = Buffer.from(body).toString()
 					} else {
-						let data = "data:" + contentType.type+'/'+contentType.subtype + ";base64," + Buffer.from(body).toString('base64')
+						data = "data:" + contentType.type+'/'+contentType.subtype + ";base64," + Buffer.from(body).toString('base64')
 					}
-					connection.send(JSON.stringify({'type': 'rawContent', 'content': data, 'contentType': contentType.type+'/'+contentType.subtype}));
+					connection.send(JSON.stringify({'type': 'rawContent', 'content': data, 'contentType': contentType.type+'/'+contentType.subtype, 'uri': command.uri}));
 				}  catch (err) {
-					connection.send(JSON.stringify({'type': 'rawContent', 'content': err , 'contentType': contentType.type+'/'+contentType.subtype}));
+					console.log(err)
+					connection.send(JSON.stringify({'type': 'rawContent', 'content': err , 'contentType': null, 'uri': command.uri}));
 				}
                 
             })
