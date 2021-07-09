@@ -14,7 +14,7 @@ socket.on('request', function(request) {
         let content = ""
         console.log(command)
         if (command.type === 'init') {
-          content = `<div class="content-container"><h1>Start by entering a URL in the box above</h1><br><p>No URL has currently been loaded into this browser</p></div>`
+          content = `<link href="https://fonts.s3.theom.nz/SanFrancisco.css" rel="stylesheet"/><style type="text/css">@charset "UTF-8";html,body{overflow:hidden;background:#1e1e1e;color:#858585;height: 100%;width: 100%; position: relative;};.ng-cloak,.ng-hide:not(.ng-hide-animate),.x-ng-cloak,[data-ng-cloak],[ng-cloak],[x-ng-cloak]{display:none!important}ng\\:form{display:block}.ng-animate-shim{visibility:hidden}.ng-anchor{position:absolute}browser-container{position:relative}.content-container{top:35%;margin:0;position: absolute;height: 100%;width: 100%;overflow:hidden;text-align:center}.content-container>h1{font-family:'San Francisco Display';font-weight:700;font-style:normal}.content-container>p{font-family:'San Francisco Display';font-weight:200;font-style:normal}</style><div class="content-container"><h1>Start by entering a URL in the box above</h1><br><p>No URL has currently been loaded into this browser</p></div>`
           uri = 'Start here'
           connection.send(JSON.stringify({'type':'displayContent','url':uri,'html':content}));
         } else if (command.type === 'loadUri') {
