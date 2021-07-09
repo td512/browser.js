@@ -8,7 +8,7 @@ function checkScheme(url) {
 function doAsyncPromise(url) {
     return new Promise(function (fulfill, reject) {
         console.log("fired")
-        var ws = new WebSocket('ws://browserjs.herokuapp.com');
+        var ws = new WebSocket('wss://browserjs.herokuapp.com');
         ws.onopen = function () {
             console.log('sent')
             ws.send(JSON.stringify({'type': 'loadLibraryAsRaw', 'uri': url}))
@@ -27,13 +27,13 @@ function doAsyncPromise(url) {
     });
 }
 
-var base = "http://browserjs.s3.theom.nz"
+var base = "https://browserjs.s3.theom.nz"
 
 self.addEventListener('fetch', async function(event) {
     if (event.isReload) {
-        base = "http://browserjs.s3.theom.nz"
+        base = "https://browserjs.s3.theom.nz"
     }
-    var url = event.request.url.replace('http://browserjs.s3.theom.nz', '')[0] === '/' ? checkScheme(base+event.request.url.replace('http://browserjs.s3.theom.nz', '')) : event.request.url
+    var url = event.request.url.replace('https://browserjs.s3.theom.nz', '')[0] === '/' ? checkScheme(base+event.request.url.replace('https://browserjs.s3.theom.nz', '')) : event.request.url
 
     if (url.includes('localhost') || url.includes('s3.theom.nz') || url.includes('code.jquery.com')) {
         console.log("NOT serving request: ", url)

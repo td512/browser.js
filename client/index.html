@@ -104,7 +104,7 @@
     current_base = ""
     $(function () {
         window.WebSocket = window.WebSocket || window.MozWebSocket;
-        var socket = new WebSocket('ws://browserjs.herokuapp.com');
+        var socket = new WebSocket('wss://browserjs.herokuapp.com');
         socket.onopen = function () {
             socket.send(JSON.stringify({'type': 'init'}));
         };
