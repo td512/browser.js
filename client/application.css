@@ -13571,6 +13571,9 @@ body:not(.tippy-touch) .tippy-popper[x-placement="left"] .tippy-tooltip[data-ani
 }
 span.browser-frame-top-input-url {
     line-height: 39px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 @media only screen and (max-width: 435px) {
     span.browser-frame-top-input-url {
