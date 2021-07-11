@@ -63,7 +63,7 @@
                                     </div>
                                 </div>
                                 <div class="browser-frame-content">
-                                    <iframe id="content-container" src=".iframe.html"></iframe>
+                                    <iframe name="browserjs" id="content-container" src=".iframe.html"></iframe>
                                 </div>
                             </div>
                         </browser-frame>
@@ -96,7 +96,13 @@
             context = JSON.parse(message.data)
             if (context.type === "displayContent") {
                 doc = document.getElementById('content-container').contentDocument
+                $(doc.documentElement).off('click')
                 doc.documentElement.innerHTML = atob(context.html)
+                $(doc.documentElement).on('click', 'a', function(e){
+                    console.log('click')
+                    e.preventDefault()
+                    socket.send(JSON.stringify({'type': 'loadUri', 'uri': addhttp(current_base + "/" + $(this).attr('href'))}))
+                })
                 $('.browser-frame-top-input-url').html(context.url)
             }
         };
@@ -104,10 +110,6 @@
         socket.onerror = function (error) {
             console.log('WebSocket error: ' + error);
         };
-        $(document).on('click', 'a', function (e) {
-            e.preventDefault()
-            socket.send(JSON.stringify({'type': 'loadUri', 'uri': addhttp(current_base + $(this).attr('href'))}))
-        })
         $('.browser-frame-top-input-url').bind('click', function () {
             $(this).attr('contentEditable', true);
         }).keypress(function (e) {
