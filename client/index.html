@@ -101,7 +101,17 @@
                 $(doc.documentElement).on('click', 'a', function(e){
                     console.log('click')
                     e.preventDefault()
-                    socket.send(JSON.stringify({'type': 'loadUri', 'uri': addhttp(current_base + "/" + $(this).attr('href'))}))
+                    newBaseUrl = $(this).attr('href')
+                    if (newBaseUrl.substring(0, 6) === "http://" || newBaseUrl.substring(0, 7) === "https://") {
+                        newBaseUrl = newBaseUrl
+                    } else if (newBaseUrl[0] === "/") {
+                        newBaseUrl = new URL(addhttp(current_base)).origin + newBaseUrl
+                    } else {
+                        addhttp(current_base + "/" + $(this).attr('href'))
+                    }
+                    socket.send(JSON.stringify({'type': 'loadUri', 'uri': newBaseUrl}))
+                    current_base = newBaseUrl
+                    navigator.serviceWorker.controller.postMessage(current_base)
                 })
                 $('.browser-frame-top-input-url').html(context.url)
             }
@@ -118,7 +128,7 @@
             {
                 $(this).attr('contentEditable', false)
                 uri = $('#urlInput').text().trim()
-                current_base = uri
+                current_base = addhttp(uri)
                 navigator.serviceWorker.controller.postMessage(current_base)
                 socket.send(JSON.stringify({'type': 'loadUri', 'uri': addhttp(uri)}))
             }
