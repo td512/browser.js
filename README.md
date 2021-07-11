@@ -1,4 +1,4 @@
-# Browser.JS - Browsers in browsers | You're on the `beta` branch
+# Browser.JS - Browsers in browsers | You're on the `release` branch
 
 You've done it! You've found Browser.JS. But now what? Why does it exist, what does it do, why should I use it?
 
@@ -33,7 +33,7 @@ npm i
 npm run start
 ```
 
-Then, all you have to do is change the websocket server configuration on [Line 90 of index.html](https://github.com/td512/browser/blob/beta/client/index.html#L90) and [Line 10 of worker.js](https://github.com/td512/browser/blob/beta/client/worker.js#L10)
+Then, all you have to do is change the websocket server configuration on [Line 90 of index.html](https://github.com/td512/browser/blob/release/client/index.html#L90) and [Line 10 of worker.js](https://github.com/td512/browser/blob/release/client/worker.js#L10)
 
 That's it! You're done. You can now browse to the place you put the client, and all things going well you'll be looking at something like this:
 
