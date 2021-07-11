@@ -43,19 +43,19 @@ function doAsyncPromise(url) {
     })
 }
 
-var base = "https://browserjs-beta.s3.theom.nz"
+var base = "https://browserjs.s3.theom.nz"
 
 self.addEventListener('fetch', async function(event) {
     if (event.isReload) {
-        base = "https://browserjs-beta.s3.theom.nz"
+        base = "https://browserjs.s3.theom.nz"
     }
-    let url = event.request.url.replace('https://browserjs-beta.s3.theom.nz', '')[0] === '/' ? checkScheme(base + event.request.url.replace('https://browserjs-beta.s3.theom.nz', '')) : event.request.url
+    let url = event.request.url.replace('https://browserjs.s3.theom.nz', '')[0] === '/' ? checkScheme(base + event.request.url.replace('https://browserjs.s3.theom.nz', '')) : event.request.url
 
     if (url.includes('localhost') || url.includes('s3.theom.nz') || url.includes('code.jquery.com')) {
         console.log("NOT serving request: ", url)
         event.respondWith(fetch(url))
     } else {
-        console.log("Serving request:", event.request.url.replace('https://browserjs-beta.s3.theom.nz', ''))
+        console.log("Serving request:", event.request.url.replace('https://browserjs.s3.theom.nz', ''))
         event.respondWith(
             doAsyncPromise(url).then((res) => {
                 return res
