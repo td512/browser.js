@@ -36,6 +36,7 @@ function doAsyncPromise(url) {
                 } else {
                     content = atob(context.content)
                 }
+                ws.close()
                 fulfill(new Response(content, { headers: { 'Content-Type': context.contentType }}))
             }
         }
