@@ -43,7 +43,7 @@ function doAsyncPromise(url) {
     })
 }
 
-var base = "https://browserjs-public-beta.s3.theom.nz"
+var base = "https://browserjs-beta.s3.theom.nz"
 
 self.addEventListener('fetch', async function(event) {
     if (event.isReload) {
