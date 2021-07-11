@@ -7,7 +7,7 @@ function checkScheme(url) {
 
 function doAsyncPromise(url) {
     return new Promise(function (fulfill, reject) {
-        var ws = new WebSocket('wss://browserjs.herokuapp.com')
+        var ws = new WebSocket('ws://localhost:8001')
         ws.onopen = function () {
             console.log('sent')
             ws.send(JSON.stringify({'type': 'loadLibraryAsRaw', 'uri': url}))
