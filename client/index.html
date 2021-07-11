@@ -25,6 +25,7 @@
         border: black 0px solid;
         width: 100%;
         height: 75%;
+        overflow: visible;
     }
     </style>
     <meta content="text/html;charset=UTF-8" http-equiv="content-type">
@@ -62,33 +63,7 @@
                                     </div>
                                 </div>
                                 <div class="browser-frame-content">
-                                    <iframe id="content-container">
-                                        <style>
-                                            html, body {
-                                                background: #1E1E1E;
-                                                color: #858585;
-                                                overflow: hidden;
-                                                text-align: center;
-                                                height: 100%;
-                                                width: 100%;
-                                            }
-
-
-                                            .content-container > h1 {
-                                                font-family: 'San Francisco Display';
-                                                font-weight: 700;
-                                                font-style: normal;
-                                            }
-
-                                            .content-container > p {
-                                                font-family: 'San Francisco Display';
-                                                font-weight: 200;
-                                                font-style: normal;
-                                            }
-                                        </style>
-                                            <h1>Connecting...</h1><br>
-                                            <p>Hold on, we're connecting you to the interwebz, this won't take long</p>
-                                    </iframe>
+                                    <iframe id="content-container" src=".iframe.html"></iframe>
                                 </div>
                             </div>
                         </browser-frame>
@@ -120,7 +95,8 @@
         socket.onmessage = function (message) {
             context = JSON.parse(message.data)
             if (context.type === "displayContent") {
-                $('#content-container').contents().find('html').html(context.html)
+                doc = document.getElementById('content-container').contentDocument
+                doc.documentElement.innerHTML = context.html
                 $('.browser-frame-top-input-url').html(context.url)
             }
         };
