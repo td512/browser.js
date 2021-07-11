@@ -1,5 +1,5 @@
 if ('serviceWorker' in navigator) {
-    let interceptorLoaded = navigator.serviceWorker.controller != null;
+    let interceptorLoaded = navigator.serviceWorker.controller != null
     window.addEventListener('load', function() {
         navigator.serviceWorker.register('worker.js')
             .then(function(registration){
