@@ -21,7 +21,22 @@ function doAsyncPromise(url) {
             console.log('recv')
             context = JSON.parse(message.data)
             if (context.type === "rawContent") {
-                fulfill(new Response(context.content, { headers: { 'Content-Type': context.contentType }}))
+                content = true
+                if (context.contentType?.includes('image')){
+                    var binaryImg = atob(context.content);
+                    var length = binaryImg.length;
+                    var ab = new ArrayBuffer(length);
+                    var ua = new Uint8Array(ab);
+                    for (var i = 0; i < length; i++) {
+                        ua[i] = binaryImg.charCodeAt(i);
+                    }
+                    var content = new Blob([ab], {
+                        type: context.contentType
+                    })
+                } else {
+                    content = atob(context.content)
+                }
+                fulfill(new Response(content, { headers: { 'Content-Type': context.contentType }}))
             }
         }
     });

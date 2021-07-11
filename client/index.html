@@ -96,7 +96,7 @@
             context = JSON.parse(message.data)
             if (context.type === "displayContent") {
                 doc = document.getElementById('content-container').contentDocument
-                doc.documentElement.innerHTML = context.html
+                doc.documentElement.innerHTML = atob(context.html)
                 $('.browser-frame-top-input-url').html(context.url)
             }
         };
