@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/td512/browser#readme",
   "dependencies": {
+    "atob": "^2.1.2",
+    "btoa": "^1.2.1",
     "content-type-parser": "^1.0.2",
     "http": "^0.0.1-security",
     "https": "^1.0.0",
