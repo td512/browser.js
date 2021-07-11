@@ -22,7 +22,7 @@ function doAsyncPromise(url) {
             context = JSON.parse(message.data)
             if (context.type === "rawContent") {
                 content = true
-                if (context.contentType.includes('image') || context.contentType.includes('video')){
+                if (context.contentType.includes('image') || context.contentType.includes('video') || context.contentType.includes('audio')){
                     var binaryImg = atob(context.content);
                     var length = binaryImg.length;
                     var ab = new ArrayBuffer(length);
