@@ -42,19 +42,19 @@ function doAsyncPromise(url) {
     });
 }
 
-var base = "http://localhost:8001"
+var base = "https://browserjs-public-beta.s3.theom.nz"
 
 self.addEventListener('fetch', async function(event) {
     if (event.isReload) {
-        base = "http://localhost:8001"
+        base = "https://browserjs-public-beta.s3.theom.nz"
     }
-    var url = event.request.url.replace('http://localhost:8001', '')[0] === '/' ? checkScheme(base+event.request.url.replace('http://localhost:8001', '')) : event.request.url
+    var url = event.request.url.replace('https://browserjs-public-beta.s3.theom.nz', '')[0] === '/' ? checkScheme(base+event.request.url.replace('https://browserjs-public-beta.s3.theom.nz', '')) : event.request.url
 
     if (url.includes('localhost') || url.includes('s3.theom.nz') || url.includes('code.jquery.com')) {
         console.log("NOT serving request: ", url)
         event.respondWith(fetch(url))
     } else {
-        console.log("Serving request:", event.request.url.replace('http://localhost:8001', ''));
+        console.log("Serving request:", event.request.url.replace('https://browserjs-public-beta.s3.theom.nz', ''));
         event.respondWith(
             doAsyncPromise(url).then((res) => {
                 return res
