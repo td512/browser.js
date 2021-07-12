@@ -38,3 +38,7 @@ Then, all you have to do is change the websocket server configuration on [Line 9
 That's it! You're done. You can now browse to the place you put the client, and all things going well you'll be looking at something like this:
 
 <img width="200px" src="https://share.s3.theom.nz/60b5f3a0-a95d-4572-bbef-1e018897027a/chrome_wSEz1aLRD2.png" />
+
+## I want to see it in action!
+
+A demo is available [over here](https://browserjs.s3.theom.nz/index.html)
