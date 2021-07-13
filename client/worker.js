@@ -7,7 +7,7 @@ function checkScheme(url) {
 
 function doAsyncPromise(url) {
     return new Promise(function (fulfill, reject) {
-        var ws = new WebSocket('ws://localhost:8001')
+        var ws = new WebSocket('ws://localhost:8000')
         ws.onopen = function () {
             console.log('sent')
             ws.send(JSON.stringify({'type': 'loadLibraryAsRaw', 'uri': url}))
@@ -43,19 +43,20 @@ function doAsyncPromise(url) {
     })
 }
 
-var base = "https://browserjs-public-beta.s3.theom.nz"
+var base = "https://localhost:8001"
 
 self.addEventListener('fetch', async function(event) {
     if (event.isReload) {
-        base = "https://browserjs-public-beta.s3.theom.nz"
+        base = "https://localhost:8001"
     }
-    let url = event.request.url.replace('https://browserjs-public-beta.s3.theom.nz', '')[0] === '/' ? checkScheme(base + event.request.url.replace('https://browserjs-public-beta.s3.theom.nz', '')) : event.request.url
+    base_url = new URL(base)
+    let url = event.request.url.replace('https://localhost:8001', '')[0] === '/' ? checkScheme(base_url.origin + event.request.url.replace('https://localhost:8001', '')) : event.request.url
 
     if (url.includes('localhost') || url.includes('s3.theom.nz') || url.includes('code.jquery.com')) {
         console.log("NOT serving request: ", url)
         event.respondWith(fetch(url))
     } else {
-        console.log("Serving request:", event.request.url.replace('https://browserjs-public-beta.s3.theom.nz', ''))
+        console.log("Serving request:", event.request.url.replace('https://localhost:8001', ''))
         event.respondWith(
             doAsyncPromise(url).then((res) => {
                 return res
