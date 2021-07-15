@@ -67,9 +67,6 @@
                                 </div>
                             </div>
                         </browser-frame>
-                        <div class="search-illustrator-disclaimer ng-binding" ng-bind-html="disclaimer">The above is an
-                            illustration for educational purposes.
-                        </div>
                     </div>
                 </div>
             </div>
@@ -103,20 +100,28 @@
                     console.log('click')
                     e.preventDefault()
                     newBaseUrl = $(this).attr('href')
-                    if (newBaseUrl.substring(0, 6) === "http://" || newBaseUrl.substring(0, 7) === "https://") {
+                    console.log(newBaseUrl)
+                    if (newBaseUrl.substring(0, 7) === "http://" || newBaseUrl.substring(0, 8) === "https://") {
                         newBaseUrl = newBaseUrl
-                    } else if (newBaseUrl[0] === "/") {
-                        newBaseUrl = new URL(addhttp(current_base)).origin + newBaseUrl
                     } else {
-                        if (addhttp(current_base).slice(-1) === "/"){
-                            newBaseUrl = new URL(addhttp(current_base)).href + newBaseUrl
+                        if (addhttp(newBaseUrl)[0] === "/"){
+                            newBaseUrl = new URL(addhttp(current_base)).origin + newBaseUrl
+                        } else if (newBaseUrl === ".." || newBaseUrl === "../" ) {
+                            url = new URL(addhttp(current_base)).href
+                            try {
+                                newBaseUrl = new URL((url.slice(-1) === "/" ? url.split('/').slice(0, -2).join('/') : url.split('/').slice(0, -1).join('/')) + "/")
+                                newBaseUrl = newBaseUrl.href
+                            } catch(err) {
+                                newBaseUrl = current_base
+                            }
                         } else {
-                            newBaseUrl = new URL(addhttp(current_base)).href + "/" + newBaseUrl
+                            url = new URL(addhttp(current_base)).href
+                            newBaseUrl = url.slice(-1) === "/" ? url + newBaseUrl : url + "/" + newBaseUrl
                         }
                     }
                     socket.send(JSON.stringify({'type': 'loadUri', 'uri': newBaseUrl}))
                     current_base = newBaseUrl
-                    navigator.serviceWorker.controller.postMessage(JSON.stringify({'type': 'updateBase', 'uri': current_base}))
+                    navigator.serviceWorker.controller.postMessage(current_base)
                 })
                 $('.browser-frame-top-input-url').html(context.url)
             } else if (context.type === "rawContent"){
