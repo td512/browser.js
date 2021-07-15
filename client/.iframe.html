@@ -2,27 +2,59 @@
 <html>
 <head>
     <link href="https://fonts.s3.theom.nz/SanFrancisco.css" rel="stylesheet"/>
-    <style>html, body {
-        background: #1E1E1E;
-        color: #858585;
+    <style type="text/css">@charset "UTF-8";
+    html, body {
         overflow: hidden;
-        text-align: center;
+        background: #1e1e1e;
+        color: #858585;
         height: 100%;
         width: 100%;
+        position: relative;
+    }
+
+    ;
+    .ng-cloak, .ng-hide:not(.ng-hide-animate), .x-ng-cloak, [data-ng-cloak], [ng-cloak], [x-ng-cloak] {
+        display: none !important
+    }
+
+    ng\:form {
+        display: block
+    }
+
+    .ng-animate-shim {
+        visibility: hidden
+    }
+
+    .ng-anchor {
+        position: absolute
+    }
+
+    browser-container {
+        position: relative
+    }
+
+    .content-container {
+        top: 35%;
+        margin: 0;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        text-align: center
     }
 
     .content-container > h1 {
         font-family: 'San Francisco Display';
         font-weight: 700;
-        font-style: normal;
+        font-style: normal
     }
 
     .content-container > p {
         font-family: 'San Francisco Display';
-        font-weight: 200;
-        font-style: normal;
+        font-weight: 400;
+        font-style: normal
     }</style>
 </head>
-<body><h1>Connecting...</h1><br>
-<p>Hold on, we're connecting you to the interwebz, this won't take long</p></body>
+<body><div class="content-container"><h1>Connecting...</h1><br>
+    <p>Hold on, we're connecting you to the interwebz, this won't take long</p></div></body>
 </html>
