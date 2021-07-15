@@ -85,12 +85,13 @@
     }
 
     current_base = ""
+    const SharedComms = new BroadcastChannel('comms')
     $(function () {
         window.WebSocket = window.WebSocket || window.MozWebSocket;
-        var socket = new WebSocket('ws://localhost:8001');
+        var socket = new WebSocket('ws://localhost:8000');
         socket.onopen = function () {
             socket.send(JSON.stringify({'type': 'init'}));
-        };
+        }
 
         socket.onmessage = function (message) {
             context = JSON.parse(message.data)
@@ -107,19 +108,31 @@
                     } else if (newBaseUrl[0] === "/") {
                         newBaseUrl = new URL(addhttp(current_base)).origin + newBaseUrl
                     } else {
-                        addhttp(current_base + "/" + $(this).attr('href'))
+                        if (addhttp(current_base).slice(-1) === "/"){
+                            newBaseUrl = new URL(addhttp(current_base)).href + newBaseUrl
+                        } else {
+                            newBaseUrl = new URL(addhttp(current_base)).href + "/" + newBaseUrl
+                        }
                     }
                     socket.send(JSON.stringify({'type': 'loadUri', 'uri': newBaseUrl}))
                     current_base = newBaseUrl
-                    navigator.serviceWorker.controller.postMessage(current_base)
+                    navigator.serviceWorker.controller.postMessage(JSON.stringify({'type': 'updateBase', 'uri': current_base}))
                 })
                 $('.browser-frame-top-input-url').html(context.url)
+            } else if (context.type === "rawContent"){
+                SharedComms.postMessage(JSON.stringify({'content': context.content, 'contentType': context.contentType, 'uri': context.uri}))
             }
-        };
+        }
 
         socket.onerror = function (error) {
             console.log('WebSocket error: ' + error);
-        };
+        }
+
+        SharedComms.onmessage = (event) => {
+            console.log("Got load request")
+            socket.send(JSON.stringify({'type': 'loadLibraryAsRaw', 'uri': event.data}))
+        }
+
         $('.browser-frame-top-input-url').bind('click', function () {
             $(this).attr('contentEditable', true);
         }).keypress(function (e) {
