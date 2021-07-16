@@ -27,6 +27,12 @@
         height: 75%;
         overflow: visible;
     }
+    #connection-status {
+        font-family: 'San Francisco Display';
+        font-weight: 400;
+        font-style: normal;
+        text-align: center;
+    }
     </style>
     <meta content="text/html;charset=UTF-8" http-equiv="content-type">
     <meta content="A browser in your browser" name="description"/>
@@ -41,6 +47,13 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="ng-scope">
+<div id="connection-status">
+    <div class="col-12">
+        <div class="alert">
+            <strong>Status: </strong><span id="updateState"></span>
+        </div>
+    </div>
+</div>
 <div class="container-fluid ng-scope" ng-controller="mainController">
     <div id="slide-5" ng-if="currentSlide == 5" class="ng-scope" style="">
         <div class="search-instruction-and-illustration-wrapper">
@@ -74,20 +87,45 @@
     </div>
 </div>
 <script>
+    function updateWebSocketStatus(socket){
+        switch (socket.readyState){
+            case 0:
+                return "<span style='color: blue'>CONNECTING</span>"
+                break
+            case 1:
+                return "<span style='color: limegreen'>CONNECTED</span>"
+                break
+            case 2:
+                return "<span style='color: darkorange'>DISCONNECTING</span>"
+                break
+            case 3:
+                return "<span style='color: red'>DISCONNECTED</span>"
+                break
+        }
+    }
+
     function addhttp(url) {
         if (!/^(?:f|ht)tps?\:\/\//.test(url)) {
-            url = "http://" + url;
+            url = "http://" + url
         }
-        return url;
+        return url
     }
 
     current_base = ""
     const SharedComms = new BroadcastChannel('comms')
     $(function () {
-        window.WebSocket = window.WebSocket || window.MozWebSocket;
-        var socket = new WebSocket('ws://localhost:8000');
+        window.WebSocket = window.WebSocket || window.MozWebSocket
+        let socket = new WebSocket('ws://localhost:8000')
+
+        let statusChange = setInterval(function(){
+            if (socket.readyState === 3){
+                clearInterval(statusChange)
+            }
+            $("#updateState").html(updateWebSocketStatus(socket))
+        }, 100)
+
         socket.onopen = function () {
-            socket.send(JSON.stringify({'type': 'init'}));
+            socket.send(JSON.stringify({'type': 'init'}))
         }
 
         socket.onmessage = function (message) {
@@ -130,7 +168,7 @@
         }
 
         socket.onerror = function (error) {
-            console.log('WebSocket error: ' + error);
+            console.log('WebSocket error: ' + error)
         }
 
         SharedComms.onmessage = (event) => {
@@ -139,9 +177,9 @@
         }
 
         $('.browser-frame-top-input-url').bind('click', function () {
-            $(this).attr('contentEditable', true);
+            $(this).attr('contentEditable', true)
         }).keypress(function (e) {
-            var key = e.which;
+            var key = e.which
             if (key == 13)  // the enter key code
             {
                 $(this).attr('contentEditable', false)
