@@ -14071,9 +14071,6 @@ body[ng-app="lmgtfy.student"] nav.navbar {
         transform: translate(0, 8px);
     }
 }
-body {
-    padding-top: 60px;
-}
 ul.dropdown-menu {
     z-index: 2;
 }
