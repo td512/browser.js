@@ -44,13 +44,21 @@
           href="application.css">
     <link href="https://fonts.s3.theom.nz/SanFrancisco.css" rel="stylesheet"/>
     <script src="service.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://assets.s3.theom.nz/jquery.js"></script>
+    <script>
+        paceOptions = {
+            ajax: false,
+            document: false,
+            eventLag: false
+        }
+    </script>
+    <link rel="stylesheet" href="https://assets.s3.theom.nz/flash.css">
 </head>
 <body class="ng-scope">
 <div id="connection-status">
     <div class="col-12">
         <div class="alert">
-            <strong>Status: </strong><span id="updateState"></span>
+            <strong>Status: </strong><span id="updateState"></span> | <strong id="browserState">Ready</strong>
         </div>
     </div>
 </div>
@@ -90,15 +98,19 @@
     function updateWebSocketStatus(socket){
         switch (socket.readyState){
             case 0:
+                $('#browserState').html('Connecting...')
                 return "<span style='color: blue'>CONNECTING</span>"
                 break
             case 1:
+                $('#browserState').html('Ready')
                 return "<span style='color: limegreen'>CONNECTED</span>"
                 break
             case 2:
+                $('#browserState').html('Disconnecting')
                 return "<span style='color: darkorange'>DISCONNECTING</span>"
                 break
             case 3:
+                $('#browserState').html('Disconnected')
                 return "<span style='color: red'>DISCONNECTED</span>"
                 break
         }
@@ -111,8 +123,12 @@
         return url
     }
 
-    current_base = ""
+    let current_base = ""
+    let totalRequestCount = 0
+    let requestCount = 0
+    let paceStarted = false
     const SharedComms = new BroadcastChannel('comms')
+
     $(function () {
         window.WebSocket = window.WebSocket || window.MozWebSocket
         let socket = new WebSocket('ws://localhost:8000')
@@ -159,11 +175,19 @@
                     }
                     socket.send(JSON.stringify({'type': 'loadUri', 'uri': newBaseUrl}))
                     current_base = newBaseUrl
+                    $('#browserState').html(`Loading...`)
                     navigator.serviceWorker.controller.postMessage(current_base)
                 })
                 $('.browser-frame-top-input-url').html(context.url)
             } else if (context.type === "rawContent"){
                 SharedComms.postMessage(JSON.stringify({'content': context.content, 'contentType': context.contentType, 'uri': context.uri}))
+                requestCount++
+                $('#browserState').html(`Loading ${requestCount}/${totalRequestCount}`)
+                if (requestCount === totalRequestCount){
+                    totalRequestCount = 0
+                    requestCount = 0
+                    $('#browserState').html(`Ready`)
+                }
             }
         }
 
@@ -173,6 +197,8 @@
 
         SharedComms.onmessage = (event) => {
             console.log("Got load request")
+            totalRequestCount++
+            $('#browserState').html(`Loading ${requestCount}/${totalRequestCount}`)
             socket.send(JSON.stringify({'type': 'loadLibraryAsRaw', 'uri': event.data}))
         }
 
