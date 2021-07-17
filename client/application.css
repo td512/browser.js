@@ -1083,8 +1083,8 @@ body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 1.42857143;
-    color: #333;
-    background-color: #fff;
+    color: #eee;
+    background-color: #0D1117;
 }
 input,
 button,
@@ -6875,8 +6875,8 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 13px;
     line-height: 1.4;
-    color: #333;
-    background-color: #fff;
+    color: #eee;
+    background-color: #0D1117;
 }
 input,
 button,
@@ -13964,8 +13964,7 @@ body[ng-app="lmgtfy.student"] nav.navbar {
     }
 }
 .search-instruction-and-illustration-wrapper {
-    width: 90%;
-    max-width: 1200px;
+    width: 100%;
     margin: auto;
 }
 @media only screen and (max-width: 1024px) {
@@ -13991,7 +13990,7 @@ body[ng-app="lmgtfy.student"] nav.navbar {
     }
 }
 .search-illustrator-wrapper {
-    width: 80%;
+    width: 100%;
     float: left;
 }
 @media only screen and (max-width: 1023px) {
