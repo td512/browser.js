@@ -1,5 +1,9 @@
+<!-- DOCTYPE declaration -->
+<!DOCTYPE html>
+<!-- START document -->
 <html>
 <head>
+    <!-- START Additional styles I want to override things in CSS files -->
     <style type="text/css">@charset "UTF-8";
     [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak, .ng-hide:not(.ng-hide-animate) {
         display: none !important;
@@ -37,19 +41,36 @@
         color: #333;
     }
     </style>
+    <!-- END Additional styles I want to override things in CSS files -->
+
+    <!-- START meta attributes, helps Google find this site -->
     <meta content="text/html;charset=UTF-8" http-equiv="content-type">
     <meta content="A browser in your browser" name="description"/>
     <meta content="browser, js, browser.js, browserjs" name="keywords"/>
+    <!-- END meta attributes, helps Google find this site -->
+
+    <!-- START MicroID, claims ownership of the page -->
     <meta content="mailto:http:sha1:e82c7705fe2e57837193994642bc9f071bb8611c" name="microid">
+    <!-- END MicroID, claims ownership of the page -->
+
+    <!-- START browser viewport overrides -->
     <meta content="user-scalable=0, initial-scale=1.0" name="viewport">
+    <!-- END browser viewport overrides -->
+
+    <!-- START document title -->
     <title>Browser.JS - Browsers in Browsers!</title>
+    <!-- END document title -->
+
+    <!-- START required assets for the page to load -->
     <link rel="stylesheet" media="all"
           href="application.css">
     <link href="https://fonts.s3.theom.nz/SanFrancisco.css" rel="stylesheet"/>
     <script src="service.js"></script>
     <script src="https://assets.s3.theom.nz/jquery.js"></script>
+    <!-- END required assets for the page to load -->
 </head>
 <body class="ng-scope">
+<!-- START connection status -->
 <div id="connection-status">
     <div class="col-12">
         <div class="alert">
@@ -57,6 +78,9 @@
         </div>
     </div>
 </div>
+<!-- END connection status -->
+
+<!-- START browser mount -->
 <div class="container-fluid ng-scope" ng-controller="mainController">
     <div id="slide-5" ng-if="currentSlide == 5" class="ng-scope" style="">
         <div class="search-instruction-and-illustration-wrapper">
@@ -89,127 +113,226 @@
         </div>
     </div>
 </div>
+<!-- END browser mount -->
+
+<!-- START inline script -->
 <script>
     function updateWebSocketStatus(socket){
+        // updateWebSocket ingests a socket object, and returns the correct HTML for the state of the websocket
         switch (socket.readyState){
+            // switch the websocket readyState. definitions taken from https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState
             case 0:
+                // state 0 is always connecting
                 $('#browserState').html('Connecting...')
                 return "<span style='color: blue'>CONNECTING</span>"
                 break
             case 1:
+                // state 1 is always ready
                 $('#browserState').html('Ready')
                 return "<span style='color: limegreen'>CONNECTED</span>"
                 break
             case 2:
+                // state 2 is always disconnecting
                 $('#browserState').html('Disconnecting')
                 return "<span style='color: darkorange'>DISCONNECTING</span>"
                 break
             case 3:
+                // state 3 is always disconnected
                 $('#browserState').html('Disconnected')
-                return "<span style='color: red'>DISCONNECTED</span>"
+                return "<span style='color: red'>DISCONNECTED</span> | <a href='javascript:void(0)' id='reconnectModal'>Reconnect?</a>"
                 break
         }
     }
 
     function addhttp(url) {
+        // addhttp ingests a URL and uses a regex test to check if the url has http:// or https:// in the URL sent, and
+        // modifies the URL on the fly. This is done to avoid breaking the server
         if (!/^(?:f|ht)tps?\:\/\//.test(url)) {
             url = "http://" + url
         }
         return url
     }
 
+    // required "global" application variables
+    // current_base deliberately breaks convention to notate it is important.
+    // current_base stores the current URL the user is visiting
     let current_base = ""
+    // totalRequestCount stores how many requests should be seen transiting the websocket connection
     let totalRequestCount = 0
+    // requestCount stores how many requests have been seen transiting the websocket connection so far
     let requestCount = 0
+    // SharedComms also breaks convention, as it is a broadcast channel and shouldn't be touched
     const SharedComms = new BroadcastChannel('comms')
 
+    // Shorthand for $(document).ready(function() { ... })
     $(function () {
+
+        // reload the window if we get disconnected - a more complete way of doing this could be to recreate the
+        // websocket object but I'm too lazy to do that, and I'm running out of time to complete this. I blame
+        // Josh McLeod for this ^TM
+
+        $('#reconnectModal').on('click', function (e){
+            // prevent the default action from executing and bubbling up the chain
+            e.preventDefault()
+            // reload the window
+            window.location.reload()
+        })
+
+        // In Chromium based browsers the websocket object will be window.WebSocket.
+        // In Gecko based browsers the websocket object will be window.MozWebSocket.
         window.WebSocket = window.WebSocket || window.MozWebSocket
+        // define a new socket
         let socket = new WebSocket('ws://localhost:8000')
 
+        // creates a setInterval loop that will check the status of the websocket every 100ms and update the state
+        // element in the document
         let statusChange = setInterval(function(){
             if (socket.readyState === 3){
+                // if the socket has been closed there's no longer any point in checking its status, so we need to
+                // clear the setInterval so it doesn't keep executing
                 clearInterval(statusChange)
             }
+            // update the HTML
             $("#updateState").html(updateWebSocketStatus(socket))
         }, 100)
 
         socket.onopen = function () {
+            // on socket open, send a json string that initializes the connection with the server and lets it know
+            // that we're a Browser.JS client
+            // {'type': 'init'}
             socket.send(JSON.stringify({'type': 'init'}))
         }
 
         socket.onmessage = function (message) {
+            // on receiving a message from the server parse the JSON we've received and store it in an object
             context = JSON.parse(message.data)
+            // if if the type of data is displayContent...
             if (context.type === "displayContent") {
+                // get the content (browser) container
                 doc = document.getElementById('content-container').contentDocument
+                // detatch all click listeners we've attached
                 $(doc.documentElement).off('click')
+                // decode the HTML (Base64 to ASCII)
                 doc.documentElement.innerHTML = atob(context.html)
+                // rebind click on the new document
                 $(doc.documentElement).on('click', 'a', function(e){
+                    // DEBUG: on click, log a click
                     console.log('click')
+                    // prevent the default action from executing and bubbling up the chain
                     e.preventDefault()
+                    // store the new base URL
                     newBaseUrl = $(this).attr('href')
+                    // DEBUG: log it to console
                     console.log(newBaseUrl)
+                    // check if the URL entered has http:// or https://
                     if (newBaseUrl.substring(0, 7) === "http://" || newBaseUrl.substring(0, 8) === "https://") {
+                        // if it does, do nothing
                         newBaseUrl = newBaseUrl
+                        // otherwise...
                     } else {
+                        // check if addhttp returns garbage
                         if (addhttp(newBaseUrl)[0] === "/"){
+                            // if it does, use the base domain of the current URL, i.e. https://old.reddit.com
+                            // and attach the new path to it, i.e. /r/DataHoarder/comments/p517u7/my_modest_40tb_data_hoard_3_years_of_archiving/
                             newBaseUrl = new URL(addhttp(current_base)).origin + newBaseUrl
+                            // if the new URL is .. or ../ (up a directory)...
                         } else if (newBaseUrl === ".." || newBaseUrl === "../" ) {
+                            // get the current URL
                             url = new URL(addhttp(current_base)).href
+                            // and try...
                             try {
+                                // to find the directory one up from the one we're in
                                 newBaseUrl = new URL((url.slice(-1) === "/" ? url.split('/').slice(0, -2).join('/') : url.split('/').slice(0, -1).join('/')) + "/")
                                 newBaseUrl = newBaseUrl.href
+                                // if we hit an error...
                             } catch(err) {
+                                // bail out and load the current page again
                                 newBaseUrl = current_base
                             }
+                            // otherwise...
                         } else {
+                            // the URL must either be taking us to the root of the domain, or to a safe URL on the current
+                            // domain. In which case, check what it's trying to take us to, and then go there
                             url = new URL(addhttp(current_base)).href
                             newBaseUrl = url.slice(-1) === "/" ? url + newBaseUrl : url + "/" + newBaseUrl
                         }
                     }
+                    // inform the server what we want to load
+                    // {'type': 'loadUri', 'uri': 'https://old.reddit.com/r/DataHoarder/comments/p517u7/my_modest_40tb_data_hoard_3_years_of_archiving/'}
                     socket.send(JSON.stringify({'type': 'loadUri', 'uri': newBaseUrl}))
+                    // reset the current base
                     current_base = newBaseUrl
+                    // change the URL bar to reflect we're loading things. This won't appear for long on most connections
                     $('#browserState').html(`Loading...`)
+                    // tell the service worker about the new base so it doesn't do weird things with the new URL
                     navigator.serviceWorker.controller.postMessage(current_base)
                 })
+                // the server sends us a rebuilt URL. Insert that into the URL bar
                 $('.browser-frame-top-input-url').html(context.url)
+                // otherwise if the type of content is rawContent...
             } else if (context.type === "rawContent"){
+                // pass the message on to the service worker via the SharedComms channel, as this message isn't meant for us.
+                // This functionality was added in a significant rewrite, that introduces additional speed by way of
+                // a single websocket connection, increasing speed by ~4000%
                 SharedComms.postMessage(JSON.stringify({'content': context.content, 'contentType': context.contentType, 'uri': context.uri}))
+                // increment requestCount, since we've just seen a new request on the line
                 requestCount++
+                // update the loading count
                 $('#browserState').html(`Loading ${requestCount}/${totalRequestCount}`)
+                // if requestCount strictly equals totalRequestCount...
                 if (requestCount === totalRequestCount){
+                    // reset the counters
                     totalRequestCount = 0
                     requestCount = 0
+                    // and set the browser status bar to reflect it's ready for requests again
                     $('#browserState').html(`Ready`)
                 }
             }
         }
 
+        // if the websocket errors...
         socket.onerror = function (error) {
+            // log it, and do nothing
             console.log('WebSocket error: ' + error)
         }
 
+        // This executes /after/ a request has been made, inline with additional assets being loaded in the iframe
+        // on a message from the SharedComms channel...
         SharedComms.onmessage = (event) => {
+            // DEBUG: we've got a load request, log it to console
             console.log("Got load request")
+            // increment totalRequestCount
             totalRequestCount++
+            // kick off the loading status counter
             $('#browserState').html(`Loading ${requestCount}/${totalRequestCount}`)
+            // and send it on to the websocket server
             socket.send(JSON.stringify({'type': 'loadLibraryAsRaw', 'uri': event.data}))
         }
 
+        // since the URL bar isn't actually a form element, on click...
         $('.browser-frame-top-input-url').bind('click', function () {
+            // make it editable
             $(this).attr('contentEditable', true)
+            // and...
         }).keypress(function (e) {
             var key = e.which
             if (key == 13)  // the enter key code
             {
+                // on enter keypress, undo the editable
                 $(this).attr('contentEditable', false)
+                // clean up the URI
                 uri = $('#urlInput').text().trim()
+                // run addhttp over it, the first pass check
                 current_base = addhttp(uri)
+                // inform the service worker about it
                 navigator.serviceWorker.controller.postMessage(current_base)
+                // finally send the loadURI request on to the websocket server
                 socket.send(JSON.stringify({'type': 'loadUri', 'uri': addhttp(uri)}))
             }
         })
     })
 </script>
+<!-- END inline script -->
 </body>
 </html>
+<!-- END document
