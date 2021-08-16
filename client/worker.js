@@ -28,17 +28,24 @@ async function waitForData(url){
 }
 
 function doAsyncPromise(url) {
+    // doAsyncPromise ingests a URL and returns a resolved promise rendering usable data to the caller
     SharedComms.postMessage(url)
 
+    // on a message from the SharedComms channel...
     SharedComms.onmessage = function (message) {
+        // parse the message data, and set up the dataQueue
         let context = JSON.parse(message.data)
         dataQueue[context.uri] = context
     }
-    
+
+    // returns a new promise
     return new Promise(async function (fulfill, reject) {
+        // wait for data for the URL to be populated. This line is very important to preventing requests firing in the wrong order
         context = await waitForData(url)
         let content = true
+        // if the contentType includes these types...
         if (context.contentType.includes('image') || context.contentType.includes('video') || context.contentType.includes('audio') || context.contentType.includes('font')){
+            // convert it back into binary data
             let binaryImg = atob(context.content)
             let length = binaryImg.length
             let ab = new ArrayBuffer(length)
@@ -46,29 +53,42 @@ function doAsyncPromise(url) {
             for (let i = 0; i < length; i++) {
                 ua[i] = binaryImg.charCodeAt(i)
             }
+            // and then into a blob object
             content = new Blob([ab], {
                 type: context.contentType
             })
+            // otherwise...
         } else {
+            // Base64 decode the content...
             content = atob(context.content)
         }
+        // and fulfill the request
         fulfill(new Response(content, {headers: {'Content-Type': context.contentType}}))
     })
     
 }
 
+// Adds an event listener for new fetches
 self.addEventListener('fetch', async function(event) {
+    // if we're reloading the window, reset the base URL
     if (event.isReload) {
         base = "http://localhost:8001"
     }
+    // otherwise, parse the base URL
     base_url = new URL(base)
+    //
     let url = event.request.url.replace(myUri, '')[0] === '/' ? checkScheme(base_url.origin + event.request.url.replace(myUri, '')) : event.request.url
 
+    // if the URL includes these values...
     if (url.includes('localhost') || url.includes('s3.theom.nz') || url.includes('code.jquery.com')) {
+        // DEBUG: log that we're not serving the request
         console.log("NOT serving request: ", url)
+        // and respond with a fetch, letting the browser fetch the URL
         event.respondWith(fetch(url))
     } else {
+        // DEBUG: log that we're serving the request
         console.log("Serving request:", event.request.url.replace(myUri, ''))
+        // and respond with an async promise, which when resolved returns the correct data
         event.respondWith(
             doAsyncPromise(url).then((res) => {
                 return res
