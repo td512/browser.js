@@ -1,13 +1,18 @@
+// requires
 var server = require('websocket').server, http = require('http'), https = require('https'), req = require('request').defaults({ encoding: null }), contentTypeParser = require("content-type-parser"), btoa = require("btoa"), atob = require('atob')
-
+// port to bind
 const PORT = process.env.PORT || 8000;
-
+// create a new server
 var socket = new server({
     httpServer: http.createServer().listen(PORT)
 });
-
+// the blocklist array
 blocklist = []
 
+// imports the OISD blocklist. Imports lines not starting with a hash and stores it in the blocklist array
+// /!\ WARNING /!\ WARNING /!\ WARNING /!\ WARNING /!\ WARNING /!\ WARNING /!\ WARNING /!\ WARNING /!\ WARNING /!\
+// THIS PROCESS CAN TAKE A VERY LONG TIME TO COMPLETE
+// /!\ WARNING /!\ WARNING /!\ WARNING /!\ WARNING /!\ WARNING /!\ WARNING /!\ WARNING /!\ WARNING /!\ WARNING /!\
 req('https://dbl.oisd.nl', function (err, res, body) {
     let lines = Buffer.from(body).toString().split('\n')
     filtered = lines.filter(function (line) {
