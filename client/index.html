@@ -3,46 +3,17 @@
 <!-- START document -->
 <html>
 <head>
-    <!-- START Additional styles I want to override things in CSS files -->
-    <style type="text/css">@charset "UTF-8";
-    [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak, .ng-hide:not(.ng-hide-animate) {
-        display: none !important;
-    }
-
-    ng\:form {
-        display: block;
-    }
-
-    .ng-animate-shim {
-        visibility: hidden;
-    }
-
-    .ng-anchor {
-        position: absolute;
-    }
-
-    browser-container {
-        position: relative;
-    }
-
-    iframe {
-        border: black 0px solid;
-        width: 100%;
-        height: 85%;
-        overflow: visible;
-    }
-    #connection-status {
-        font-family: 'San Francisco Display';
-        font-weight: 400;
-        font-style: normal;
-        text-align: center;
-    }
-    #urlInput {
-        color: #333;
-    }
-    </style>
-    <!-- END Additional styles I want to override things in CSS files -->
-
+<style>
+.input100 {
+  font-size: 15px;
+  line-height: 1.5;
+  width: 100%;
+  height: 50px;
+  border-radius: 25px;
+  padding: 0 20px 0 20px;
+  outline: none;
+  border: none;
+  </style>
     <!-- START meta attributes, helps Google find this site -->
     <meta content="text/html;charset=UTF-8" http-equiv="content-type">
     <meta content="A browser in your browser" name="description"/>
@@ -62,59 +33,31 @@
     <!-- END document title -->
 
     <!-- START required assets for the page to load -->
-    <link rel="stylesheet" media="all"
-          href="application.css">
-    <link href="https://fonts.s3.theom.nz/SanFrancisco.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <script src="service.js"></script>
+	<link href="https://fonts.s3.theom.nz/SanFrancisco.css" rel="stylesheet"/>
     <script src="https://assets.s3.theom.nz/jquery.js"></script>
     <!-- END required assets for the page to load -->
 </head>
-<body class="ng-scope">
-<!-- START connection status -->
-<div id="connection-status">
-    <div class="col-12">
-        <div class="alert">
-            <strong>Status: </strong><span id="updateState"></span> | <strong id="browserState">Ready</strong>
-        </div>
-    </div>
-</div>
-<!-- END connection status -->
-
-<!-- START browser mount -->
-<div class="container-fluid ng-scope" ng-controller="mainController">
-    <div id="slide-5" ng-if="currentSlide == 5" class="ng-scope" style="">
-        <div class="search-instruction-and-illustration-wrapper">
-            <div class="search-illustrator-wrapper">
-                <div final-timing-delay="delayBeforeDone" search-illustrator="" user-click-prompt="Click Here"
-                     class="ng-isolate-scope">
-                    <div>
-                        <browser-frame url="startingUrlTyping" class="ng-isolate-scope">
-                            <div class="browser-frame">
-                                <div class="browser-frame-top">
-                                    <div class="browser-frame-top-row">
-                                        <div class="browser-frame-top-left"></div>
-                                        <div class="browser-frame-top-input">
-                                            <div class="browser-frame-top-input-left"></div>
-                                            <span class="browser-frame-top-input-url ng-binding" id="urlInput"
-                                                  ng-bind="url">Not Connected</span>
-                                            <div class="browser-frame-top-input-right"></div>
-                                        </div>
-                                        <div class="browser-frame-top-right"></div>
-                                    </div>
-                                </div>
-                                <div class="browser-frame-content">
-                                    <iframe name="browserjs" id="content-container" src=".iframe.html"></iframe>
-                                </div>
-                            </div>
-                        </browser-frame>
-                    </div>
+<body style="background: var(--bs-body-color); font-family: 'San Francisco Display'; height: 100vh">
+    <nav class="navbar navbar-expand-md fixed-top navbar-shrink py-3 navbar-light" id="mainNav" style="background: var(--bs-body-color);">
+        <div class="container"><a class="navbar-brand d-flex align-items-center" href="/"></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navcol-1">
+                <ul class="navbar-nav mx-auto"></ul>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4"><div style="color: var(--bs-info);font-size: 16px;margin-right: auto;margin-left: 17%;margin-top: 9%;" class="align-items-center"><strong>Status: </strong><span id="updateState">Unknown</span> | <strong id="browserState">Ready</strong></div></div>
+                    <div class="col-md-4"></div>
+					<input class="browser-frame-top-input-url input100" style="margin-top: 15px; text-align: center;" type="text" placeholder="Enter a URL here and hit RETURN to load the page">
                 </div>
             </div>
         </div>
+    </nav>
+    <div class="container-fluid" style="width: 100vw;height: 80vh;">
+        <div class="row"><iframe name="browserjs" id="content-container" src=".iframe.html" style="background: white;border:none;height: 95vh; width: 96vw; margin-left: 2%; margin-right: 2%; overflow: scroll" frameborder="0" allowTransparency="true"></iframe></div>
     </div>
-</div>
-<!-- END browser mount -->
-
 <!-- START inline script -->
 <script>
     function updateWebSocketStatus(socket){
@@ -124,22 +67,22 @@
             case 0:
                 // state 0 is always connecting
                 $('#browserState').html('Connecting...')
-                return "<span style='color: blue'>CONNECTING</span>"
+                return "<span style='color: blue'>Connecting</span>"
                 break
             case 1:
                 // state 1 is always ready
                 $('#browserState').html('Ready')
-                return "<span style='color: limegreen'>CONNECTED</span>"
+                return "<span style='color: limegreen'>Online</span>"
                 break
             case 2:
                 // state 2 is always disconnecting
                 $('#browserState').html('Disconnecting')
-                return "<span style='color: darkorange'>DISCONNECTING</span>"
+                return "<span style='color: darkorange'>Going Offline</span>"
                 break
             case 3:
                 // state 3 is always disconnected
                 $('#browserState').html('Disconnected')
-                return "<span style='color: red'>DISCONNECTED</span> | <a href='javascript:void(0)' id='reconnectModal'>Reconnect?</a>"
+                return "<span style='color: red'>Offline</span>"
                 break
         }
     }
@@ -268,7 +211,7 @@
                     navigator.serviceWorker.controller.postMessage(current_base)
                 })
                 // the server sends us a rebuilt URL. Insert that into the URL bar
-                $('.browser-frame-top-input-url').html(context.url)
+                $('.browser-frame-top-input-url').val(context.url)
                 // otherwise if the type of content is rawContent...
             } else if (context.type === "rawContent"){
                 // pass the message on to the service worker via the SharedComms channel, as this message isn't meant for us.
@@ -310,18 +253,12 @@
         }
 
         // since the URL bar isn't actually a form element, on click...
-        $('.browser-frame-top-input-url').bind('click', function () {
-            // make it editable
-            $(this).attr('contentEditable', true)
-            // and...
-        }).keypress(function (e) {
+        $('.browser-frame-top-input-url').keypress(function (e) {
             var key = e.which
             if (key == 13)  // the enter key code
             {
-                // on enter keypress, undo the editable
-                $(this).attr('contentEditable', false)
                 // clean up the URI
-                uri = $('#urlInput').text().trim()
+                uri = $('.browser-frame-top-input-url').val().trim()
                 // run addhttp over it, the first pass check
                 current_base = addhttp(uri)
                 // inform the service worker about it
